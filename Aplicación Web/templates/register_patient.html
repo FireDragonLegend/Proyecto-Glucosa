@@ -1,0 +1,40 @@
+<!DOCTYPE html5>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Paciente</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+<body>
+    <header>
+        <h1>Registro de Paciente</h1>
+    </header>
+    <main>
+        <form action="{{ url_for('register_patient') }}" method="post" class="form">
+            <label for="nombre">Nombre Completo:</label>
+            <input type="text" id="nombre" name="nombre" required>
+
+            <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
+            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+
+            <label for="lugar_tratamiento">Lugar de Tratamiento/Seguimiento:</label>
+            <input type="text" id="lugar_tratamiento" name="lugar_tratamiento" required>
+
+            <label for="nacionalidad">Nacionalidad (País y Estado):</label>
+            <input type="text" id="nacionalidad" name="nacionalidad" required>
+
+            <label for="edad">Edad:</label>
+            <input type="number" id="edad" name="edad" required>
+
+            <label for="email">Gmail:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit" class="btn">Registrar</button>
+        </form>
+        <a href="{{ url_for('index') }}" class="btn back">Volver</a>
+    </main>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html5>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Paciente</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Detalles del Paciente: {{ paciente.nombre }}</h1>
+    </header>
+    <main>
+        <div class="info-section">
+            <h2>Información del Paciente</h2>
+            <p><strong>Edad:</strong> {{ paciente.edad }}</p>
+            <p><strong>Email:</strong> {{ paciente.email }}</p>
+            <p><strong>Fecha de Nacimiento:</strong> {{ paciente.fecha_nacimiento }}</p>
+            <p><strong>Lugar de Tratamiento:</strong> {{ paciente.lugar_tratamiento }}</p>
+            <p><strong>Nacionalidad:</strong> {{ paciente.nacionalidad }}</p>
+            <p><strong>Fecha de Ingreso:</strong> {{ paciente.fecha_ingreso }}</p>
+        </div>
+
+        <h2>Historial de Lecturas</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Día</th>
+                    <th>Fecha</th>
+                    <th>Glucosa Ayunas</th>
+                    <th>Glucosa 2h</th>
+                    <th>A1C</th>
+                    <th>LDL</th>
+                    <th>HDL</th>
+                    <th>Triglicéridos</th>
+                    <th>Colesterol Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lectura in lecturas %}
+                <tr>
+                    <td>{{ lectura.dia }}</td>
+                    <td>{{ lectura.fecha }}</td>
+                    <td>{{ lectura.glucosa_ayunas or '-' }}</td>
+                    <td>{{ lectura.glucosa_2h or '-' }}</td>
+                    <td>{{ lectura.a1c or '-' }}</td>
+                    <td>{{ lectura.ldl or '-' }}</td>
+                    <td>{{ lectura.hdl or '-' }}</td>
+                    <td>{{ lectura.trigliceridos or '-' }}</td>
+                    <td>{{ lectura.colesterol_total or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ url_for('evaluate_patient', paciente_id=paciente.id) }}" class="btn">Evaluar con IA</a>
+        <a href="{{ url_for('professional_dashboard') }}" class="btn back">Volver</a>
+    </main>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html5>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monitor de Glucosa</title>
+<link rel="stylesheet" href="/static/css/styles.css">
+</head>
+
+<body>
+
+<!-- Barra principal -->
+<div class="nav-bar">
+
+    <div class="nav-left">
+        <img src="/static/img/logo.jpeg" alt="Logo" class="logo">
+        <h2 class="module-name">Módulo de Glucosa</h2>
+    </div>
+
+    <div class="nav-buttons">
+        <a href="{{ url_for('register_patient') }}" class="btn">Registro Paciente</a>
+        <a href="{{ url_for('register_professional') }}" class="btn">Registro Profesional</a>
+        <a href="{{ url_for('login') }}" class="btn">Iniciar Sesión</a>
+    </div>
+
+</div>
+
+<!-- Contenido -->
+<main class="content">
+
+<h1>Monitor Inteligente de Glucosa</h1>
+
+<p>
+Esta aplicación permite registrar y analizar niveles de glucosa de manera segura,
+facilitando el seguimiento médico y ayudando a los profesionales de salud
+a evaluar los datos mediante herramientas de inteligencia artificial.
+</p>
+
+<h3>Cómo funciona</h3>
+
+<ol>
+<li>Registro de pacientes y profesionales.</li>
+<li>Inicio de sesión seguro.</li>
+<li>Registro de niveles de glucosa.</li>
+<li>Análisis y seguimiento médico.</li>
+</ol>
+
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+
+<p>© 2024 Monitor de Glucosa</p>
+<a href="#">Términos y Condiciones</a>
+
+</footer>
+
+</body>
+</html>

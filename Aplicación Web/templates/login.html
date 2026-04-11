@@ -1,0 +1,39 @@
+<!DOCTYPE html5>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Iniciar Sesión</h1>
+    </header>
+    <main>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="flash">{{ messages[0] }}</div>
+        {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('login') }}" method="post" class="form">
+            <label for="identifier">Email (paciente) / Cédula o Nombre (profesional):</label>
+            <input type="text" id="identifier" name="identifier" placeholder="ej. paciente@ejemplo.com o 8987897987" required>
+            <small class="hint">Si eres profesional, asegúrate de seleccionar "Profesional" y usar tu cédula o nombre exacto.</small>
+
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="user_type">Tipo de Usuario:</label>
+            <select id="user_type" name="user_type" required>
+                <option value="paciente">Paciente</option>
+                <option value="profesional">Profesional</option>
+            </select>
+
+            <button type="submit" class="btn">Iniciar Sesión</button>
+        </form>
+        <a href="{{ url_for('index') }}" class="btn back">Volver</a>
+    </main>
+</body>
+</html>

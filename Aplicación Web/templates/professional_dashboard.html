@@ -1,0 +1,166 @@
+<!DOCTYPE html5>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Profesional</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .container { display: flex; height: calc(100vh - 100px); }
+        .left-panel { width: 450px; padding: 10px; border-right: 1px solid #ccc; overflow-y: auto; }
+        .right-panel { flex: 1; padding: 10px; }
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; margin-bottom: 5px; }
+        .form-group input, .form-group select { width: 100%; padding: 5px; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { border: 1px solid #ccc; padding: 5px; text-align: center; }
+        .summary { white-space: pre-line; background: #f9f9f9; padding: 10px; border: 1px solid #ccc; }
+        .info { white-space: pre-line; background: #f0f0f0; padding: 10px; border: 1px solid #ccc; }
+        .status { font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🏥 Aplicación Médica - Evaluación de Diabetes</h1>
+        <a href="{{ url_for('logout') }}" class="btn">Cerrar Sesión</a>
+    </header>
+    <div class="container">
+        <div class="left-panel">
+            <!-- Selección de Paciente -->
+            <div class="form-group">
+                <label for="paciente_select">Seleccionar paciente:</label>
+                <form method="post" style="display: inline;">
+                    <select id="paciente_select" name="paciente_id" onchange="this.form.submit()">
+                        <option value="">-- Seleccionar --</option>
+                        {% for p in pacientes %}
+                        <option value="{{ p.id }}" {% if paciente and p.id == paciente.id %}selected{% endif %}>{{ p.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="hidden" name="select_patient" value="1">
+                </form>
+            </div>
+
+            <!-- Información del Paciente -->
+            <div class="form-group">
+                <label>Información del Paciente:</label>
+                <div class="info">{{ info_paciente }}</div>
+            </div>
+
+            <!-- Corrección de Lectura -->
+            <div class="form-group">
+                <label>Corrección de lectura</label>
+                <form method="post" action="{{ url_for('save_reading') }}">
+                    <label for="dia">Día (1-90):</label>
+                    <select id="dia" name="dia" onchange="loadReading(this.value)">
+                        {% for i in range(1, 91) %}
+                        <option value="{{ i }}">{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="glucosa_ayunas">Glucosa ayunas (mg/dL):</label>
+                    <input type="number" step="0.1" id="glucosa_ayunas" name="glucosa_ayunas">
+                    <label for="glucosa_2h">Glucosa 2h post (mg/dL):</label>
+                    <input type="number" step="0.1" id="glucosa_2h" name="glucosa_2h">
+                    <label for="a1c">A1C (%):</label>
+                    <input type="number" step="0.1" id="a1c" name="a1c">
+                    <label for="ldl">LDL (mg/dL):</label>
+                    <input type="number" step="0.1" id="ldl" name="ldl">
+                    <label for="hdl">HDL (mg/dL):</label>
+                    <input type="number" step="0.1" id="hdl" name="hdl">
+                    <label for="trigliceridos">Triglicéridos (mg/dL):</label>
+                    <input type="number" step="0.1" id="trigliceridos" name="trigliceridos">
+                    <label for="colesterol_total">Colesterol Total (mg/dL):</label>
+                    <input type="number" step="0.1" id="colesterol_total" name="colesterol_total">
+                    <button type="submit">Guardar corrección</button>
+                </form>
+            </div>
+
+            <!-- Resumen del Estado del Paciente -->
+            <div class="form-group">
+                <label>Resumen del Estado del Paciente:</label>
+                <div class="summary">{{ resumen }}</div>
+            </div>
+
+            <!-- Herramientas Profesionales -->
+            <div class="form-group">
+                <label>Herramientas Profesionales:</label>
+                {% if paciente %}
+                <a href="{{ url_for('evaluate_patient', paciente_id=paciente.id) }}" class="btn">Evaluar con IA Avanzada</a>
+                {% endif %}
+                <div class="status">Estado IA: {{ model_status }}</div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <h2>Historial de Lecturas del Paciente</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Día</th>
+                        <th>Fecha</th>
+                        <th>Ayuno</th>
+                        <th>2h Pos</th>
+                        <th>A1C</th>
+                        <th>LDL</th>
+                        <th>HDL</th>
+                        <th>Trig</th>
+                        <th>Total Chol</th>
+                        <th>Clasif Ayuno</th>
+                        <th>Clasif 2h</th>
+                        <th>Clasif A1C</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in lecturas %}
+                    <tr>
+                        <td>{{ r.dia }}</td>
+                        <td>{{ r.fecha }}</td>
+                        <td>{{ r.glucosa_ayunas or '-' }}</td>
+                        <td>{{ r.glucosa_2h or '-' }}</td>
+                        <td>{{ r.a1c or '-' }}</td>
+                        <td>{{ r.ldl or '-' }}</td>
+                        <td>{{ r.hdl or '-' }}</td>
+                        <td>{{ r.trigliceridos or '-' }}</td>
+                        <td>{{ r.colesterol_total or '-' }}</td>
+                        <td>{{ classify_fast(r.glucosa_ayunas) if r.glucosa_ayunas else '-' }}</td>
+                        <td>{{ classify_post(r.glucosa_2h) if r.glucosa_2h else '-' }}</td>
+                        <td>{{ classify_a1c(r.a1c) if r.a1c else '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Detalles y Notas del Profesional -->
+            <h2>Detalles y Notas del Profesional</h2>
+            <form method="post" action="{{ url_for('save_note') }}">
+                <textarea name="nota" rows="8" placeholder="Escribe notas aquí..."></textarea>
+                <button type="submit">Guardar Nota</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const lecturas = {{ lecturas | tojson }};
+
+        function loadReading(day) {
+            const reading = lecturas.find(r => r.dia == day);
+            if (reading) {
+                document.getElementById('glucosa_ayunas').value = reading.glucosa_ayunas || '';
+                document.getElementById('glucosa_2h').value = reading.glucosa_2h || '';
+                document.getElementById('a1c').value = reading.a1c || '';
+                document.getElementById('ldl').value = reading.ldl || '';
+                document.getElementById('hdl').value = reading.hdl || '';
+                document.getElementById('trigliceridos').value = reading.trigliceridos || '';
+                document.getElementById('colesterol_total').value = reading.colesterol_total || '';
+            } else {
+                document.getElementById('glucosa_ayunas').value = '';
+                document.getElementById('glucosa_2h').value = '';
+                document.getElementById('a1c').value = '';
+                document.getElementById('ldl').value = '';
+                document.getElementById('hdl').value = '';
+                document.getElementById('trigliceridos').value = '';
+                document.getElementById('colesterol_total').value = '';
+            }
+        }
+    </script>
+</body>
+</html>

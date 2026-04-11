@@ -1,0 +1,56 @@
+<!DOCTYPE html5>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Profesional</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Registro de Profesional de la Salud</h1>
+    </header>
+    <main>
+        <form action="{{ url_for('register_professional') }}" method="post" enctype="multipart/form-data" class="form">
+            <label for="cedula">Número de Cédula Profesional:</label>
+            <input type="text" id="cedula" name="cedula" required>
+
+            <label for="nombre">Nombre Completo:</label>
+            <input type="text" id="nombre" name="nombre" required>
+
+            <label for="edad">Edad:</label>
+            <input type="number" id="edad" name="edad" required>
+
+            <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
+            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+
+            <label for="lugar_trabajo">Lugar donde Trabaja (o Nombre de Consultoría):</label>
+            <input type="text" id="lugar_trabajo" name="lugar_trabajo" required>
+
+            <label for="nacionalidad">Nacionalidad (País y Estado):</label>
+            <input type="text" id="nacionalidad" name="nacionalidad" required>
+
+            <label for="curp">CURP:</label>
+            <input type="text" id="curp" name="curp" required>
+
+            <label for="rfc">RFC:</label>
+            <input type="text" id="rfc" name="rfc" required>
+
+            <label for="clues">CLUES (si aplica):</label>
+            <input type="text" id="clues" name="clues">
+
+            <label for="cct">CCT (si aplica):</label>
+            <input type="text" id="cct" name="cct">
+
+            <label for="foto">Foto:</label>
+            <input type="file" id="foto" name="foto" accept="image/*" required>
+
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit" class="btn">Registrar</button>
+        </form>
+        <a href="{{ url_for('index') }}" class="btn back">Volver</a>
+    </main>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html5>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación del Paciente</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Evaluación IA - {{ paciente.nombre }}</h1>
+    </header>
+    <main>
+        {% if error %}
+        <p class="error">{{ error }}</p>
+        {% else %}
+        <div class="info-section">
+            <h2>Resultado de Evaluación</h2>
+            <p><strong>Probabilidad de Diabetes:</strong> {{ "%.2f"|format(prob * 100) }}%</p>
+            <p><strong>Etapa:</strong> {{ stage }}</p>
+        </div>
+
+        <div class="info-section">
+            <h2>Factores de Riesgo</h2>
+            <ul>
+                {% for factor in risk_factors %}
+                <li>{{ factor }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="info-section">
+            <h2>Recomendaciones</h2>
+            <ul>
+                {% for rec in recommendations %}
+                <li>{{ rec }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <a href="{{ url_for('view_patient', paciente_id=paciente.id) }}" class="btn back">Volver al Paciente</a>
+    </main>
+</body>
+</html>

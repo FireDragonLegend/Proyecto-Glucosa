@@ -1,0 +1,78 @@
+<!DOCTYPE html5>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Paciente</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Panel de Paciente</h1>
+    </header>
+    <main>
+        <h2>Agregar Nueva Lectura</h2>
+        <form action="{{ url_for('add_reading') }}" method="post" class="form">
+            <label for="dia">Día:</label>
+            <input type="number" id="dia" name="dia" required>
+
+            <label for="glucosa_ayunas">Glucosa Ayunas (mg/dL):</label>
+            <input type="number" step="0.1" id="glucosa_ayunas" name="glucosa_ayunas">
+
+            <label for="glucosa_2h">Glucosa 2h Post (mg/dL):</label>
+            <input type="number" step="0.1" id="glucosa_2h" name="glucosa_2h">
+
+            <label for="a1c">A1C (%):</label>
+            <input type="number" step="0.1" id="a1c" name="a1c">
+
+            <label for="ldl">LDL (mg/dL):</label>
+            <input type="number" step="0.1" id="ldl" name="ldl">
+
+            <label for="hdl">HDL (mg/dL):</label>
+            <input type="number" step="0.1" id="hdl" name="hdl">
+
+            <label for="trigliceridos">Triglicéridos (mg/dL):</label>
+            <input type="number" step="0.1" id="trigliceridos" name="trigliceridos">
+
+            <label for="colesterol_total">Colesterol Total (mg/dL):</label>
+            <input type="number" step="0.1" id="colesterol_total" name="colesterol_total">
+
+            <button type="submit" class="btn">Agregar Lectura</button>
+        </form>
+
+        <h2>Historial de Lecturas</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Día</th>
+                    <th>Fecha</th>
+                    <th>Glucosa Ayunas</th>
+                    <th>Glucosa 2h</th>
+                    <th>A1C</th>
+                    <th>LDL</th>
+                    <th>HDL</th>
+                    <th>Triglicéridos</th>
+                    <th>Colesterol Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lectura in lecturas %}
+                <tr>
+                    <td>{{ lectura.dia }}</td>
+                    <td>{{ lectura.fecha }}</td>
+                    <td>{{ lectura.glucosa_ayunas or '-' }}</td>
+                    <td>{{ lectura.glucosa_2h or '-' }}</td>
+                    <td>{{ lectura.a1c or '-' }}</td>
+                    <td>{{ lectura.ldl or '-' }}</td>
+                    <td>{{ lectura.hdl or '-' }}</td>
+                    <td>{{ lectura.trigliceridos or '-' }}</td>
+                    <td>{{ lectura.colesterol_total or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ url_for('logout') }}" class="btn">Cerrar Sesión</a>
+    </main>
+</body>
+</html>
