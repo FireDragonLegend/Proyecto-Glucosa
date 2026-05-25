@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Paciente — Monitor de Glucosa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        /* ── ESTILOS EXCLUSIVOS DEL REGISTER ── */
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-body {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card {
+            max-width: 500px;
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .card-header h1 {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 6px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* Grid de 2 columnas para algunos campos */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 16px;
+        }
+
+        .form-grid .input-group {
+            grid-column: span 1;
+        }
+
+        .form-grid .full-width {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 520px) {
+            .card { padding: 28px 20px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-grid .full-width { grid-column: span 1; }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="nav-bar">
+    <div class="nav-left">
+        <img src="/static/img/logo.jpeg" alt="Logo" class="logo">
+        <h2 class="module-name">Monitor de Glucosa</h2>
+    </div>
+    <a href="{{ url_for('index') }}" class="btn">← Inicio</a>
+</nav>
+
+<!-- CONTENIDO -->
+<div class="page-body">
+    <div class="card">
+
+        <div class="card-header">
+            <h1>🙋 Registro de Paciente</h1>
+            <p class="subtitle">Completa tu información médica</p>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash">{{ messages[0] }}</div>
+        {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('register_patient') }}" method="post">
+            <div class="form-grid">
+
+                <div class="input-group full-width">
+                    <label>Nombre Completo</label>
+                    <input type="text" name="nombre" placeholder="Ej. María García López" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Fecha de Nacimiento</label>
+                    <input type="date" name="fecha_nacimiento" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Edad</label>
+                    <input type="number" name="edad" placeholder="Ej. 35" required>
+                </div>
+
+                <div class="input-group full-width">
+                    <label>Lugar de Tratamiento</label>
+                    <input type="text" name="lugar_tratamiento" placeholder="Ej. Hospital General" required>
+                </div>
+
+                <div class="input-group full-width">
+                    <label>Nacionalidad</label>
+                    <input type="text" name="nacionalidad" placeholder="Ej. Mexicana" required>
+                </div>
+
+                <div class="input-group full-width">
+                    <label>Correo electrónico</label>
+                    <input type="email" name="email" placeholder="correo@gmail.com" required>
+                </div>
+
+                <div class="input-group full-width">
+                    <label>Contraseña</label>
+                    <input type="password" name="password" placeholder="••••••••" required>
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn-submit" style="margin-top: 8px;">
+                Registrar Paciente
+            </button>
+        </form>
+
+        <a href="{{ url_for('login') }}" class="back-link">¿Ya tienes cuenta? Inicia sesión</a>
+
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Profesional — Monitor de Glucosa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-body {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card {
+            max-width: 560px;
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .card-header h1 {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 6px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .section-divider {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--blue-light);
+            margin: 22px 0 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 16px;
+        }
+
+        .form-grid .input-group { grid-column: span 1; }
+        .form-grid .full-width  { grid-column: span 2; }
+
+        .input-group input[type="file"] {
+            padding: 8px 12px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .input-group input[type="file"]::-webkit-file-upload-button {
+            background: var(--blue-primary);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-right: 10px;
+        }
+
+        /* Caja de verificación */
+        .verify-box {
+            background: rgba(29,111,164,0.05);
+            border: 1px solid rgba(29,111,164,0.2);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            margin-bottom: 6px;
+        }
+
+        .verify-box .verify-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--blue-primary);
+            margin: 0 0 4px;
+        }
+
+        .verify-box .verify-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin: 0 0 10px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 520px) {
+            .card { padding: 28px 20px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-grid .full-width { grid-column: span 1; }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="nav-bar">
+    <div class="nav-left">
+        <img src="/static/img/logo.jpeg" alt="Logo" class="logo">
+        <h2 class="module-name">Monitor de Glucosa</h2>
+    </div>
+    <a href="{{ url_for('index') }}" class="btn">← Inicio</a>
+</nav>
+
+<!-- CONTENIDO -->
+<div class="page-body">
+    <div class="card">
+
+        <div class="card-header">
+            <h1>👨‍⚕️ Registro Profesional</h1>
+            <p class="subtitle">Datos del profesional de la salud</p>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash">{{ messages[0] }}</div>
+        {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('register_professional') }}" method="post" enctype="multipart/form-data">
+
+            <!-- Datos personales -->
+            <div class="section-divider">Datos Personales</div>
+            <div class="form-grid">
+                <div class="input-group full-width">
+                    <label>Nombre Completo</label>
+                    <input type="text" name="nombre" placeholder="Ej. Dr. Juan Pérez" required>
+                </div>
+                <div class="input-group">
+                    <label>Fecha de Nacimiento</label>
+                    <input type="date" name="fecha_nacimiento" required>
+                </div>
+                <div class="input-group">
+                    <label>Edad</label>
+                    <input type="number" name="edad" placeholder="Ej. 40" required>
+                </div>
+                <div class="input-group full-width">
+                    <label>Nacionalidad</label>
+                    <input type="text" name="nacionalidad" placeholder="Ej. Mexicana" required>
+                </div>
+            </div>
+
+            <!-- Datos profesionales -->
+            <div class="section-divider">Datos Profesionales</div>
+            <div class="form-grid">
+                <div class="input-group full-width">
+                    <label>Número de Cédula Profesional</label>
+                    <input type="text" name="cedula" placeholder="Ej. 12345678" required>
+                </div>
+                <div class="input-group full-width">
+                    <label>Lugar de Trabajo / Consultorio</label>
+                    <input type="text" name="lugar_trabajo" placeholder="Ej. Hospital General de México" required>
+                </div>
+                <div class="input-group">
+                    <label>CURP</label>
+                    <input type="text" name="curp" placeholder="18 caracteres" required>
+                </div>
+                <div class="input-group">
+                    <label>RFC</label>
+                    <input type="text" name="rfc" placeholder="13 caracteres" required>
+                </div>
+                <div class="input-group">
+                    <label>CLUES <span style="color:var(--text-dim)">(opcional)</span></label>
+                    <input type="text" name="clues" placeholder="Ej. MXSSA123456">
+                </div>
+                <div class="input-group">
+                    <label>CCT <span style="color:var(--text-dim)">(opcional)</span></label>
+                    <input type="text" name="cct" placeholder="Ej. 09DES0001K">
+                </div>
+            </div>
+
+            <!-- Verificación de cédula -->
+            <div class="section-divider">Verificación de Cédula</div>
+            <div class="verify-box">
+                <p class="verify-title">📋 ¿Por qué necesitamos esto?</p>
+                <p class="verify-desc">
+                    Para garantizar la seguridad del sistema, verificamos que el número de cédula 
+                    que escribiste coincida con tu documento oficial. Sube una foto clara donde 
+                    el número sea legible.
+                </p>
+                <div class="input-group" style="margin-bottom: 0;">
+                    <label>Foto de tu Cédula Profesional</label>
+                    <input type="file" name="foto_cedula" accept="image/*" required>
+                    <small class="hint">📷 Asegúrate que el número de cédula sea visible y legible.</small>
+                </div>
+            </div>
+
+            <!-- Foto y acceso -->
+            <div class="section-divider">Foto y Acceso</div>
+            <div class="form-grid">
+                <div class="input-group full-width">
+                    <label>Foto de perfil</label>
+                    <input type="file" name="foto" accept="image/*" required>
+                </div>
+                <div class="input-group full-width">
+                    <label>Contraseña</label>
+                    <input type="password" name="password" placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" style="margin-top: 8px;">
+                Registrar Profesional
+            </button>
+
+        </form>
+
+        <a href="{{ url_for('login') }}" class="back-link">¿Ya tienes cuenta? Inicia sesión</a>
+
+    </div>
+</div>
+
+</body>
+</html>

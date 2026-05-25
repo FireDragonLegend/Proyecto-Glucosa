@@ -1,0 +1,201 @@
+<!DOCTYPE html5>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Paciente</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <!-- 🔥 ESTILO EXTRA SOLO PARA ESTE PANEL -->
+    <style>
+
+        /* Header con info */
+        .patient-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .patient-header small {
+            color: #d1d5db;
+        }
+
+        /* Hover tarjetas */
+        .patient-box {
+            transition: 0.3s;
+        }
+
+        .patient-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+        }
+
+        /* Inputs pro */
+        .patient-form input:focus {
+            border-color: #1e40af;
+            box-shadow: 0 0 8px rgba(30,64,175,0.4);
+        }
+
+        /* Botón pro */
+        .patient-form .btn:hover {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+
+        /* Tabla moderna */
+        .patient-table tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        .patient-table tr:hover {
+            background: #e0f2fe;
+        }
+
+        /* Badges */
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .badge-good {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Responsive solo aquí */
+        @media (max-width: 768px) {
+            .patient-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <div class="nav-bar">
+        <div class="nav-left">
+            <h1 class="module-name">🏥 Panel de Paciente</h1>
+        </div>
+        <div class="nav-buttons">
+            <a href="{{ url_for('logout') }}" class="btn">Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <div class="patient-wrapper">
+
+        <!-- HEADER FORM -->
+        <div class="patient-header">
+            <h2 class="patient-title">🧪 Nueva Lectura</h2>
+            <small>Registro clínico</small>
+        </div>
+
+        <!-- FORM -->
+        <div class="patient-box">
+            <form action="{{ url_for('add_reading') }}" method="post" class="patient-form">
+
+                <label>Día</label>
+                <input type="number" name="dia" required>
+
+                <label>Glucosa Ayunas</label>
+                <input type="number" step="0.1" name="glucosa_ayunas">
+
+                <label>Glucosa 2h</label>
+                <input type="number" step="0.1" name="glucosa_2h">
+
+                <label>A1C</label>
+                <input type="number" step="0.1" name="a1c">
+
+                <label>LDL</label>
+                <input type="number" step="0.1" name="ldl">
+
+                <label>HDL</label>
+                <input type="number" step="0.1" name="hdl">
+
+                <label>Triglicéridos</label>
+                <input type="number" step="0.1" name="trigliceridos">
+
+                <label>Colesterol Total</label>
+                <input type="number" step="0.1" name="colesterol_total">
+
+                <button type="submit" class="btn">Guardar Lectura</button>
+
+            </form>
+        </div>
+
+        <!-- HEADER TABLA -->
+        <div class="patient-header">
+            <h2 class="patient-title">📊 Historial</h2>
+            <small>Seguimiento médico</small>
+        </div>
+
+        <!-- TABLA -->
+        <div class="patient-box">
+            <table class="patient-table">
+                <thead>
+                    <tr>
+                        <th>Día</th>
+                        <th>Fecha</th>
+                        <th>Ayunas</th>
+                        <th>2h</th>
+                        <th>A1C</th>
+                        <th>Estado</th>
+                        <th>LDL</th>
+                        <th>HDL</th>
+                        <th>Trig</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for lectura in lecturas %}
+                    <tr>
+                        <td>{{ lectura.dia }}</td>
+                        <td>{{ lectura.fecha }}</td>
+                        <td>{{ lectura.glucosa_ayunas or '-' }}</td>
+                        <td>{{ lectura.glucosa_2h or '-' }}</td>
+                        <td>{{ lectura.a1c or '-' }}</td>
+
+                        <!-- 🔥 ESTADO INTELIGENTE -->
+                        <td>
+                            {% if lectura.a1c and lectura.a1c < 5.7 %}
+                                <span class="badge badge-good">Normal</span>
+                            {% elif lectura.a1c and lectura.a1c < 6.5 %}
+                                <span class="badge badge-warning">Riesgo</span>
+                            {% elif lectura.a1c %}
+                                <span class="badge badge-danger">Alto</span>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                        <td>{{ lectura.ldl or '-' }}</td>
+                        <td>{{ lectura.hdl or '-' }}</td>
+                        <td>{{ lectura.trigliceridos or '-' }}</td>
+                        <td>{{ lectura.colesterol_total or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+</html>

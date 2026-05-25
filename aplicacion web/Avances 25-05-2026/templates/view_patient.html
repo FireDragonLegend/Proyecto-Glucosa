@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Paciente — Monitor de Glucosa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        /* ── ESTILOS EXCLUSIVOS DE VIEW PATIENT ── */
+
+        .page-body {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header del paciente */
+        .patient-hero {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .patient-hero h1 {
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 18px;
+        }
+
+        .patient-hero h1 span {
+            color: var(--blue-light);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .info-item span:first-child {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .info-item span:last-child {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .btn-ia {
+            padding: 11px 20px;
+            background: linear-gradient(135deg, #0ea5e9, #6366f1);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-ia:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(14,165,233,0.3);
+        }
+
+        /* Tabla */
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 16px;
+        }
+
+        .table-wrapper {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-bottom: 28px;
+            backdrop-filter: blur(12px);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table th {
+            background: rgba(14,165,233,0.12);
+            color: var(--blue-light);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            padding: 11px 14px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .data-table td {
+            padding: 10px 14px;
+            text-align: center;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: rgba(14,165,233,0.05); }
+
+        @media (max-width: 768px) {
+            .patient-hero {
+                flex-direction: column;
+            }
+
+            .hero-actions {
+                flex-direction: row;
+                width: 100%;
+            }
+
+            .btn-ia, .btn {
+                flex: 1;
+                text-align: center;
+            }
+
+            .table-wrapper {
+                overflow-x: auto;
+            }
+
+            .data-table {
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="nav-bar">
+    <div class="nav-left">
+        <img src="/static/img/logo.jpeg" alt="Logo" class="logo">
+        <h2 class="module-name">Detalles del Paciente</h2>
+    </div>
+    <a href="{{ url_for('professional_dashboard') }}" class="btn">← Volver</a>
+</nav>
+
+<div class="page-body">
+
+    <!-- Info paciente -->
+    <div class="patient-hero">
+        <div style="flex: 1;">
+            <h1>👤 <span>{{ paciente.nombre }}</span></h1>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span>Edad</span>
+                    <span>{{ paciente.edad }} años</span>
+                </div>
+                <div class="info-item">
+                    <span>Email</span>
+                    <span>{{ paciente.email }}</span>
+                </div>
+                <div class="info-item">
+                    <span>Fecha de Nacimiento</span>
+                    <span>{{ paciente.fecha_nacimiento }}</span>
+                </div>
+                <div class="info-item">
+                    <span>Lugar de Tratamiento</span>
+                    <span>{{ paciente.lugar_tratamiento }}</span>
+                </div>
+                <div class="info-item">
+                    <span>Nacionalidad</span>
+                    <span>{{ paciente.nacionalidad }}</span>
+                </div>
+                <div class="info-item">
+                    <span>Fecha de Ingreso</span>
+                    <span>{{ paciente.fecha_ingreso }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-actions">
+            <a href="{{ url_for('evaluate_patient', paciente_id=paciente.id) }}" class="btn-ia">
+                🤖 Evaluar con IA
+            </a>
+            <a href="{{ url_for('professional_dashboard') }}" class="btn">
+                ← Volver
+            </a>
+        </div>
+    </div>
+
+    <!-- Historial -->
+    <h2 class="section-title">📊 Historial de Lecturas</h2>
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Día</th>
+                    <th>Fecha</th>
+                    <th>Glucosa Ayunas</th>
+                    <th>Glucosa 2h</th>
+                    <th>A1C</th>
+                    <th>LDL</th>
+                    <th>HDL</th>
+                    <th>Triglicéridos</th>
+                    <th>Colesterol Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lectura in lecturas %}
+                <tr>
+                    <td>{{ lectura.dia }}</td>
+                    <td>{{ lectura.fecha }}</td>
+                    <td>{{ lectura.glucosa_ayunas or '—' }}</td>
+                    <td>{{ lectura.glucosa_2h or '—' }}</td>
+                    <td>{{ lectura.a1c or '—' }}</td>
+                    <td>{{ lectura.ldl or '—' }}</td>
+                    <td>{{ lectura.hdl or '—' }}</td>
+                    <td>{{ lectura.trigliceridos or '—' }}</td>
+                    <td>{{ lectura.colesterol_total or '—' }}</td>
+                </tr>
+                {% endfor %}
+                {% if not lecturas %}
+                <tr>
+                    <td colspan="9" style="color: var(--text-dim); padding: 24px;">
+                        No hay lecturas registradas para este paciente.
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>

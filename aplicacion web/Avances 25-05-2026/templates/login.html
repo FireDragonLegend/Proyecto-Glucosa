@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión — Monitor de Glucosa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        /* ── ESTILOS EXCLUSIVOS DEL LOGIN ── */
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-body {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .card-icon {
+            width: 58px;
+            height: 58px;
+            object-fit: cover;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            box-shadow: 0 0 30px rgba(56,189,248,0.25);
+        }
+
+        .card h1 {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 6px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* Selector visual de tipo de usuario */
+        .type-switcher {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 24px;
+            gap: 4px;
+        }
+
+        .type-btn {
+            padding: 10px;
+            text-align: center;
+            border-radius: 9px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .type-btn.active {
+            background: var(--blue-primary);
+            color: white;
+        }
+
+        .type-btn:hover:not(.active) {
+            color: var(--text-secondary);
+            background: rgba(255,255,255,0.04);
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="nav-bar">
+    <div class="nav-left">
+        <img src="/static/img/logo.jpeg" alt="Logo" class="logo">
+        <h2 class="module-name">Monitor de Glucosa</h2>
+    </div>
+    <a href="{{ url_for('index') }}" class="btn">← Inicio</a>
+</nav>
+
+<!-- CONTENIDO -->
+<div class="page-body">
+    <div class="card">
+
+        <div class="card-header">
+            <img src="/static/img/logo.jpeg" alt="Logo" class="card-icon">
+            <h1>Bienvenido</h1>
+            <p class="subtitle">Accede a tu panel médico</p>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash">{{ messages[0] }}</div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Selector visual de tipo -->
+        <div class="type-switcher">
+            <div class="type-btn active" data-value="paciente" onclick="switchType('paciente')">
+                🙋 Paciente
+            </div>
+            <div class="type-btn" data-value="profesional" onclick="switchType('profesional')">
+                👨‍⚕️ Profesional
+            </div>
+        </div>
+
+        <form action="{{ url_for('login') }}" method="post">
+
+            <!-- Campo oculto real para Flask -->
+            <input type="hidden" name="user_type" id="user_type_hidden" value="paciente">
+
+            <div class="input-group">
+                <label id="identifier_label">Correo electrónico</label>
+                <input type="text" name="identifier" id="identifier"
+                    placeholder="paciente@correo.com" required>
+                <small class="hint" id="hint_text">
+                    Ingresa el correo con el que te registraste.
+                </small>
+            </div>
+
+            <div class="input-group">
+                <label>Contraseña</label>
+                <div class="password-container">
+                    <input type="password" name="password" id="password"
+                           placeholder="••••••••" required>
+                    <span class="material-icons toggle-password" onclick="togglePassword(this)">
+                        visibility
+                    </span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">Entrar al sistema →</button>
+
+        </form>
+
+        <a href="{{ url_for('index') }}" class="back-link">← Volver al inicio</a>
+
+    </div>
+</div>
+
+<script>
+    function switchType(value) {
+        document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`[data-value="${value}"]`).classList.add('active');
+        document.getElementById('user_type_hidden').value = value;
+
+        const label = document.getElementById('identifier_label');
+        const input = document.getElementById('identifier');
+        const hint  = document.getElementById('hint_text');
+
+        if (value === 'paciente') {
+            label.textContent = 'Correo electrónico';
+            input.placeholder = 'paciente@correo.com';
+            input.type = 'email';
+            hint.textContent = 'Ingresa el correo con el que te registraste.';
+        } else {
+            label.textContent = 'Cédula o Nombre';
+            input.placeholder = 'Ej. 12345678 o Dr. Juan Pérez';
+            input.type = 'text';
+            hint.textContent = 'Ingresa tu número de cédula o nombre exacto.';
+        }
+    }
+
+    function togglePassword(icon) {
+        const input = icon.previousElementSibling;
+        input.type = input.type === 'password' ? 'text' : 'password';
+        icon.textContent = input.type === 'password' ? 'visibility' : 'visibility_off';
+    }
+</script>
+
+</body>
+</html>
