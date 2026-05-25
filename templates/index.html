@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor de Glucosa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        /* ── ESTILOS EXCLUSIVOS DEL INDEX ── */
+
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 90px 24px 70px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(ellipse at center, rgba(29,111,164,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(29,111,164,0.08);
+            border: 1px solid rgba(29,111,164,0.25);
+            color: var(--blue-primary);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(32px, 5vw, 56px);
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 20px;
+            line-height: 1.15;
+            max-width: 700px;
+        }
+
+        .hero h1 em { font-style: normal; color: var(--blue-primary); }
+
+        .hero > p {
+            font-size: clamp(15px, 2vw, 17px);
+            color: var(--text-secondary);
+            max-width: 560px;
+            line-height: 1.75;
+            margin: 0 0 40px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* Features */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            max-width: 960px;
+            margin: 0 auto 80px;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 28px 24px;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-card);
+        }
+
+        .feature-card:hover {
+            border-color: var(--border-soft);
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(29,111,164,0.15);
+        }
+
+        .feature-icon { font-size: 30px; margin-bottom: 14px; display: block; }
+
+        .feature-card h3 {
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0 0 10px;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.65;
+            margin: 0;
+        }
+
+        /* How it works */
+        .how-section {
+            max-width: 720px;
+            margin: 0 auto 80px;
+            padding: 0 24px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .how-section h2 {
+            font-family: var(--font-display);
+            color: var(--text-primary);
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 36px;
+        }
+
+        .steps { display: grid; gap: 14px; text-align: left; }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 20px 22px;
+            box-shadow: var(--shadow-card);
+            transition: border-color 0.2s;
+        }
+
+        .step:hover { border-color: var(--border-soft); }
+
+        .step-num {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            background: rgba(29,111,164,0.1);
+            border: 1px solid rgba(29,111,164,0.25);
+            color: var(--blue-primary);
+            font-weight: 700;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .step-body h4 {
+            color: var(--text-primary);
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0 0 5px;
+        }
+
+        .step-body p {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 640px) {
+            .hero { padding: 60px 20px 50px; }
+            .hero::before { width: 90%; }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+    <img src="/static/img/logo.jpeg" id="loader-logo" alt="Logo">
+    <p class="loader-text">Monitor de Glucosa</p>
+    <p id="tap-text">Toca para entrar</p>
+</div>
+
+<!-- NAVBAR -->
+<nav class="nav-bar">
+    <div class="nav-left">
+    <img src="/static/img/logo.jpeg" alt="Logo" class="logo" style="width:55px; height:55px; border-radius:50%; object-fit:cover;">
+     <h2 class="module-name">Monitor de Glucosa</h2>
+    </div>
+    <div class="nav-buttons">
+        <a href="{{ url_for('register_patient') }}" class="btn">Registro Paciente</a>
+        <a href="{{ url_for('register_professional') }}" class="btn">Registro Profesional</a>
+        <a href="{{ url_for('login') }}" class="btn-primary">Iniciar Sesión</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-badge"><span>🤖</span> Impulsado por Inteligencia Artificial</div>
+    <h1>Monitoreo inteligente de <em>glucosa y diabetes</em></h1>
+    <p>Registra, analiza y da seguimiento a niveles de glucosa de forma segura. Conecta pacientes con profesionales de salud mediante herramientas de IA avanzada.</p>
+    <div class="hero-actions">
+        <a href="{{ url_for('register_patient') }}" class="btn-hero-primary">Registrarme como Paciente</a>
+        <a href="{{ url_for('login') }}" class="btn-hero-secondary">Ya tengo cuenta →</a>
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+    <div class="feature-card">
+        <span class="feature-icon">🧬</span>
+        <h3>Análisis Clínico</h3>
+        <p>Registra glucosa en ayunas, postprandial, A1C, lípidos y colesterol en un solo lugar.</p>
+    </div>
+    <div class="feature-card">
+        <span class="feature-icon">🤖</span>
+        <h3>Evaluación con IA</h3>
+        <p>Modelos de IA evalúan el riesgo de diabetes y generan recomendaciones personalizadas.</p>
+    </div>
+    <div class="feature-card">
+        <span class="feature-icon">👨‍⚕️</span>
+        <h3>Panel Profesional</h3>
+        <p>Los médicos pueden ver el historial completo, corregir lecturas y hacer anotaciones clínicas.</p>
+    </div>
+    <div class="feature-card">
+        <span class="feature-icon">📊</span>
+        <h3>Historial Completo</h3>
+        <p>Seguimiento día a día durante 90 días con clasificación automática de cada lectura.</p>
+    </div>
+</section>
+
+<!-- CÓMO FUNCIONA -->
+<section class="how-section">
+    <h2>¿Cómo funciona?</h2>
+    <div class="steps">
+        <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+                <h4>Registro de usuarios</h4>
+                <p>Pacientes se registran con su correo. Profesionales usan su cédula profesional.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+                <h4>Inicio de sesión seguro</h4>
+                <p>Cada rol accede a su panel exclusivo con información y herramientas específicas.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+                <h4>Registro de lecturas</h4>
+                <p>El paciente ingresa sus valores clínicos diariamente con total facilidad.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+                <h4>Seguimiento y evaluación</h4>
+                <p>El profesional revisa el historial y activa la evaluación con IA cuando lo necesite.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <span>© 2026 Monitor de Glucosa</span>
+    <a href="#">Términos y Condiciones</a>
+</footer>
+
+<script>
+    const loader = document.getElementById("loader");
+
+    if (sessionStorage.getItem('loaderVisto')) {
+        loader.style.display = "none";
+    }
+
+    loader.addEventListener("click", () => {
+        loader.classList.add("fade-out");
+        setTimeout(() => { loader.style.display = "none"; }, 850);
+        sessionStorage.setItem('loaderVisto', 'true');
+    });
+
+    setTimeout(() => {
+        loader.classList.add("fade-out");
+        setTimeout(() => {
+            loader.style.display = "none";
+            sessionStorage.setItem('loaderVisto', 'true');
+        }, 850);
+    }, 6000);
+</script>
+<script>
+    // Easter egg — escribe "snake" para activar
+    let typed = '';
+    document.addEventListener('keydown', (e) => {
+        typed += e.key.toLowerCase();
+        if (typed.length > 5) typed = typed.slice(-5);
+        if (typed === 'snake') {
+            typed = '';
+            launchSnake();
+        }
+    });
+
+    function launchSnake() {
+        // Overlay
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed; inset: 0; background: rgba(12,35,64,0.96);
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; z-index: 99999;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        `;
+
+        overlay.innerHTML = `
+            <div style="text-align:center; margin-bottom: 16px;">
+                <span style="font-size:13px; letter-spacing:2px; text-transform:uppercase; color:#7db8d8;">Easter Egg</span>
+                <h2 style="color:white; font-family:'Sora',sans-serif; margin:6px 0 0; font-size:22px;">🐍 Snake</h2>
+            </div>
+            <canvas id="snakeCanvas" width="400" height="400"
+                style="border: 2px solid rgba(29,111,164,0.5); border-radius:12px; background:#060d1a;"></canvas>
+            <div style="margin-top:14px; display:flex; gap:20px; align-items:center;">
+                <span id="snakeScore" style="color:#7db8d8; font-size:14px;">Puntos: 0</span>
+                <span style="color:#334155; font-size:12px;">Flechas para mover • ESC para salir</span>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+        document.addEventListener('keydown', handleEsc);
+
+        function handleEsc(e) {
+            if (e.key === 'Escape') {
+                document.body.removeChild(overlay);
+                document.removeEventListener('keydown', handleEsc);
+                clearInterval(gameLoop);
+            }
+        }
+
+        // Juego
+        const canvas = document.getElementById('snakeCanvas');
+        const ctx = canvas.getContext('2d');
+        const SIZE = 20;
+        const COLS = canvas.width / SIZE;
+        const ROWS = canvas.height / SIZE;
+
+        let snake = [{x:10, y:10}];
+        let dir = {x:1, y:0};
+        let nextDir = {x:1, y:0};
+        let food = spawnFood();
+        let score = 0;
+        let alive = true;
+
+        function spawnFood() {
+            let pos;
+            do {
+                pos = {
+                    x: Math.floor(Math.random() * COLS),
+                    y: Math.floor(Math.random() * ROWS)
+                };
+            } while (snake.some(s => s.x === pos.x && s.y === pos.y));
+            return pos;
+        }
+
+        document.addEventListener('keydown', handleDir);
+        function handleDir(e) {
+            if (e.key === 'ArrowUp'    && dir.y === 0) nextDir = {x:0,  y:-1};
+            if (e.key === 'ArrowDown'  && dir.y === 0) nextDir = {x:0,  y:1};
+            if (e.key === 'ArrowLeft'  && dir.x === 0) nextDir = {x:-1, y:0};
+            if (e.key === 'ArrowRight' && dir.x === 0) nextDir = {x:1,  y:0};
+            if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Grid sutil
+            ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i < COLS; i++) {
+                ctx.beginPath(); ctx.moveTo(i*SIZE,0); ctx.lineTo(i*SIZE,canvas.height); ctx.stroke();
+            }
+            for (let j = 0; j < ROWS; j++) {
+                ctx.beginPath(); ctx.moveTo(0,j*SIZE); ctx.lineTo(canvas.width,j*SIZE); ctx.stroke();
+            }
+
+            // Comida
+            ctx.fillStyle = '#f87171';
+            ctx.beginPath();
+            ctx.arc(food.x*SIZE + SIZE/2, food.y*SIZE + SIZE/2, SIZE/2 - 2, 0, Math.PI*2);
+            ctx.fill();
+
+            // Serpiente
+            snake.forEach((seg, i) => {
+                const ratio = i / snake.length;
+                ctx.fillStyle = i === 0 ? '#1d6fa4' : `rgba(29,111,164,${0.9 - ratio * 0.5})`;
+                ctx.beginPath();
+                ctx.roundRect(seg.x*SIZE+1, seg.y*SIZE+1, SIZE-2, SIZE-2, 4);
+                ctx.fill();
+            });
+
+            // Game over
+            if (!alive) {
+                ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 28px Sora, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Game Over', canvas.width/2, canvas.height/2 - 16);
+                ctx.font = '16px Plus Jakarta Sans, sans-serif';
+                ctx.fillStyle = '#7db8d8';
+                ctx.fillText('Presiona R para reiniciar', canvas.width/2, canvas.height/2 + 18);
+            }
+        }
+
+        function update() {
+            if (!alive) return;
+            dir = nextDir;
+            const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+
+            // Colisión pared
+            if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) {
+                alive = false; return;
+            }
+            // Colisión consigo mismo
+            if (snake.some(s => s.x === head.x && s.y === head.y)) {
+                alive = false; return;
+            }
+
+            snake.unshift(head);
+
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                document.getElementById('snakeScore').textContent = `Puntos: ${score}`;
+                food = spawnFood();
+            } else {
+                snake.pop();
+            }
+        }
+
+        // Reiniciar con R
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'r' || e.key === 'R') {
+                if (!alive) {
+                    snake = [{x:10, y:10}];
+                    dir = {x:1, y:0};
+                    nextDir = {x:1, y:0};
+                    food = spawnFood();
+                    score = 0;
+                    alive = true;
+                    document.getElementById('snakeScore').textContent = 'Puntos: 0';
+                }
+            }
+        });
+
+        const gameLoop = setInterval(() => { update(); draw(); }, 120);
+        draw();
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Profesional — Monitor de Glucosa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        /* ── ESTILOS EXCLUSIVOS DEL PANEL PROFESIONAL ── */
+
+        .dashboard {
+            display: flex;
+            height: calc(100vh - 57px);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Panel izquierdo */
+        .left-panel {
+            width: 380px;
+            flex-shrink: 0;
+            border-right: 1px solid var(--border-subtle);
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: rgba(6, 13, 26, 0.6);
+        }
+
+        .left-panel::-webkit-scrollbar { width: 4px; }
+        .left-panel::-webkit-scrollbar-track { background: transparent; }
+        .left-panel::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 4px; }
+
+        /* Panel derecho */
+        .right-panel {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .right-panel::-webkit-scrollbar { width: 4px; }
+        .right-panel::-webkit-scrollbar-track { background: transparent; }
+        .right-panel::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 4px; }
+
+        /* Secciones del panel izquierdo */
+        .panel-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            backdrop-filter: blur(12px);
+        }
+
+        .panel-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--blue-light);
+            margin: 0 0 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+    
+
+        /* Select paciente */
+        .patient-select {
+            width: 100%;
+            padding: 10px 13px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-input);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .patient-select:focus {
+            border-color: rgba(14,165,233,0.6);
+            box-shadow: 0 0 0 3px rgba(14,165,233,0.1);
+        }
+
+        /* Info paciente */
+        .info-box {
+            background: rgba(14,165,233,0.05);
+            border: 1px solid rgba(14,165,233,0.1);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            white-space: pre-line;
+            line-height: 1.7;
+        }
+
+        /* Form corrección */
+        .correction-form label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin: 10px 0 4px;
+        }
+
+        .correction-form input,
+        .correction-form select {
+            width: 100%;
+            padding: 8px 11px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-input);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 13px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .correction-form input:focus,
+        .correction-form select:focus {
+            border-color: rgba(14,165,233,0.6);
+            box-shadow: 0 0 0 2px rgba(14,165,233,0.1);
+        }
+
+        .btn-save {
+            width: 100%;
+            margin-top: 14px;
+            padding: 10px;
+            background: var(--blue-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-save:hover {
+            background: var(--blue-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Resumen */
+        .summary-box {
+            background: rgba(14,165,233,0.05);
+            border: 1px solid rgba(14,165,233,0.1);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            white-space: pre-line;
+            line-height: 1.7;
+        }
+
+        /* Botón IA */
+        .btn-ia {
+            width: 100%;
+            padding: 11px;
+            background: linear-gradient(135deg, #0ea5e9, #6366f1);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .btn-ia:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(14,165,233,0.3);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: blink 2s infinite;
+        }
+
+        /* Panel derecho — tabla */
+        .right-panel h2 {
+            font-family: var(--font-display);
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 16px;
+        }
+
+        .table-wrapper {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-bottom: 28px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table th {
+            background: rgba(14,165,233,0.12);
+            color: var(--blue-light);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            padding: 11px 14px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .data-table td {
+            padding: 10px 14px;
+            text-align: center;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: rgba(14,165,233,0.05); }
+
+        /* Clasificación con colores */
+        .clasif-normal   { color: #4ade80; font-weight: 600; }
+        .clasif-pre      { color: #facc15; font-weight: 600; }
+        .clasif-diabetes { color: #f87171; font-weight: 600; }
+
+        /* Notas */
+        .notes-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+        }
+
+        .notes-section textarea {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-input);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 14px;
+            resize: vertical;
+            outline: none;
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+
+        .notes-section textarea:focus {
+            border-color: rgba(14,165,233,0.6);
+            box-shadow: 0 0 0 3px rgba(14,165,233,0.1);
+        }
+
+        .notes-section textarea::placeholder { color: var(--text-dim); }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .dashboard {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .left-panel {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-subtle);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="nav-bar">
+    <div class="nav-left">
+        <img src="/static/img/logo.jpeg" alt="Logo" class="logo">
+        <h2 class="module-name">Panel de Profesional</h2>
+    </div>
+    <a href="{{ url_for('logout') }}" class="btn">Cerrar Sesión</a>
+</nav>
+
+<div class="dashboard">
+
+    <!-- ── PANEL IZQUIERDO ── -->
+    <div class="left-panel">
+        <!-- Tarjeta del profesional -->
+<div class="panel-section">
+    <div style="display:flex; align-items:center; gap:14px;">
+        {% if profesional.foto_path %}
+        <img src="/{{ profesional.foto_path }}" 
+             style="width:52px; height:52px; border-radius:50%; object-fit:cover; border:2px solid var(--border-soft);">
+        {% else %}
+        <div style="width:52px; height:52px; border-radius:50%; background:var(--blue-faint); border:2px solid var(--border-soft); display:flex; align-items:center; justify-content:center; font-size:22px;">
+            👨‍⚕️
+        </div>
+        {% endif %}
+        <div>
+            <div style="font-weight:700; font-size:14px; color:var(--text-primary);">
+                {{ profesional.nombre }}
+            </div>
+            <div style="font-size:12px; color:var(--text-muted);">
+                Cédula: {{ profesional.cedula }}
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Selección de paciente -->
+        <div class="panel-section">
+            <p class="panel-section-title">👤 Seleccionar Paciente</p>
+            <form method="post">
+                <select class="patient-select" name="paciente_id" onchange="this.form.submit()">
+                    <option value="">— Seleccionar paciente —</option>
+                    {% for p in pacientes %}
+                    <option value="{{ p.id }}" {% if paciente and p.id == paciente.id %}selected{% endif %}>
+                        {{ p.nombre }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <input type="hidden" name="select_patient" value="1">
+            </form>
+        </div>
+
+        <!-- Info paciente -->
+        <div class="panel-section">
+            <p class="panel-section-title">📋 Información del Paciente</p>
+            <div class="info-box">{{ info_paciente }}</div>
+        </div>
+
+        <!-- Corrección de lectura -->
+        <div class="panel-section">
+            <p class="panel-section-title">✏️ Corrección de Lectura</p>
+            <form method="post" action="{{ url_for('save_reading') }}" class="correction-form">
+                <label>Día (1-90)</label>
+                <select id="dia" name="dia" onchange="loadReading(this.value)">
+                    {% for i in range(1, 91) %}
+                    <option value="{{ i }}">Día {{ i }}</option>
+                    {% endfor %}
+                </select>
+
+                <label>Glucosa Ayunas (mg/dL)</label>
+                <input type="number" step="0.1" id="glucosa_ayunas" name="glucosa_ayunas" placeholder="—">
+
+                <label>Glucosa 2h Post (mg/dL)</label>
+                <input type="number" step="0.1" id="glucosa_2h" name="glucosa_2h" placeholder="—">
+
+                <label>A1C (%)</label>
+                <input type="number" step="0.1" id="a1c" name="a1c" placeholder="—">
+
+                <label>LDL (mg/dL)</label>
+                <input type="number" step="0.1" id="ldl" name="ldl" placeholder="—">
+
+                <label>HDL (mg/dL)</label>
+                <input type="number" step="0.1" id="hdl" name="hdl" placeholder="—">
+
+                <label>Triglicéridos (mg/dL)</label>
+                <input type="number" step="0.1" id="trigliceridos" name="trigliceridos" placeholder="—">
+
+                <label>Colesterol Total (mg/dL)</label>
+                <input type="number" step="0.1" id="colesterol_total" name="colesterol_total" placeholder="—">
+
+                <button type="submit" class="btn-save">Guardar Corrección</button>
+            </form>
+        </div>
+
+        <!-- Resumen -->
+        <div class="panel-section">
+            <p class="panel-section-title">📊 Resumen del Paciente</p>
+            <div class="summary-box">{{ resumen }}</div>
+        </div>
+
+        <!-- Herramientas IA -->
+        <div class="panel-section">
+            <p class="panel-section-title">🤖 Herramientas IA</p>
+            {% if paciente %}
+            <a href="{{ url_for('evaluate_patient', paciente_id=paciente.id) }}" class="btn-ia">
+                Evaluar con IA Avanzada
+            </a>
+            {% else %}
+            <p style="color: var(--text-dim); font-size: 13px; margin: 0;">
+                Selecciona un paciente para activar la evaluación.
+            </p>
+            {% endif %}
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                Estado IA: {{ model_status }}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ── PANEL DERECHO ── -->
+    <div class="right-panel">
+
+        <h2>📈 Historial de Lecturas</h2>
+
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Día</th>
+                        <th>Fecha</th>
+                        <th>Ayunas</th>
+                        <th>2h Post</th>
+                        <th>A1C</th>
+                        <th>LDL</th>
+                        <th>HDL</th>
+                        <th>Trig</th>
+                        <th>Col. Total</th>
+                        <th>Clasif. Ayunas</th>
+                        <th>Clasif. 2h</th>
+                        <th>Clasif. A1C</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in lecturas %}
+                    <tr>
+                        <td>{{ r.dia }}</td>
+                        <td>{{ r.fecha }}</td>
+                        <td>{{ r.glucosa_ayunas or '—' }}</td>
+                        <td>{{ r.glucosa_2h or '—' }}</td>
+                        <td>{{ r.a1c or '—' }}</td>
+                        <td>{{ r.ldl or '—' }}</td>
+                        <td>{{ r.hdl or '—' }}</td>
+                        <td>{{ r.trigliceridos or '—' }}</td>
+                        <td>{{ r.colesterol_total or '—' }}</td>
+                        <td>
+                            {% if r.glucosa_ayunas %}
+                                {% set c = classify_fast(r.glucosa_ayunas) %}
+                                <span class="clasif-{{ 'normal' if c == 'Normal' else 'pre' if c == 'Prediabetes' else 'diabetes' }}">{{ c }}</span>
+                            {% else %}—{% endif %}
+                        </td>
+                        <td>
+                            {% if r.glucosa_2h %}
+                                {% set c = classify_post(r.glucosa_2h) %}
+                                <span class="clasif-{{ 'normal' if c == 'Normal' else 'pre' if c == 'Prediabetes' else 'diabetes' }}">{{ c }}</span>
+                            {% else %}—{% endif %}
+                        </td>
+                        <td>
+                            {% if r.a1c %}
+                                {% set c = classify_a1c(r.a1c) %}
+                                <span class="clasif-{{ 'normal' if c == 'Normal' else 'pre' if c == 'Prediabetes' else 'diabetes' }}">{{ c }}</span>
+                            {% else %}—{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not lecturas %}
+                    <tr>
+                        <td colspan="12" style="color: var(--text-dim); padding: 24px;">
+                            No hay lecturas registradas para este paciente.
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Notas -->
+        <h2>📝 Notas del Profesional</h2>
+        <div class="notes-section">
+            <form method="post" action="{{ url_for('save_note') }}">
+                <textarea name="nota" rows="6" placeholder="Escribe observaciones clínicas aquí..."></textarea>
+                <button type="submit" class="btn-save" style="width: auto; padding: 10px 24px; margin-top: 12px;">
+                    Guardar Nota
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const lecturas = {{ lecturas | tojson }};
+
+    function loadReading(day) {
+        const reading = lecturas.find(r => r.dia == day);
+        const fields = ['glucosa_ayunas', 'glucosa_2h', 'a1c', 'ldl', 'hdl', 'trigliceridos', 'colesterol_total'];
+        fields.forEach(f => {
+            document.getElementById(f).value = reading ? (reading[f] || '') : '';
+        });
+    }
+</script>
+
+</body>
+</html>

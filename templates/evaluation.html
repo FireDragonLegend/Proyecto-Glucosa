@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación IA — Monitor de Glucosa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .page-body {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 30px 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .eval-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 24px 28px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .eval-header-icon {
+            font-size: 36px;
+            flex-shrink: 0;
+        }
+
+        .eval-header h1 {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 4px;
+        }
+
+        .eval-header p {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin: 0;
+        }
+
+        /* Error */
+        .error-box {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            color: #fca5a5;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* Resultado principal */
+        .result-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(12px);
+        }
+
+        .result-card h2 {
+            font-family: var(--font-display);
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--blue-light);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 11px;
+            margin: 0 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        /* Probabilidad */
+        .prob-display {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 20px;
+        }
+
+        .prob-circle {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border: 3px solid;
+        }
+
+        .prob-circle.low    { border-color: #4ade80; background: rgba(74,222,128,0.08); }
+        .prob-circle.medium { border-color: #facc15; background: rgba(250,204,21,0.08); }
+        .prob-circle.high   { border-color: #f87171; background: rgba(248,113,113,0.08); }
+
+        .prob-circle .prob-num {
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .prob-circle.low    .prob-num { color: #4ade80; }
+        .prob-circle.medium .prob-num { color: #facc15; }
+        .prob-circle.high   .prob-num { color: #f87171; }
+
+        .prob-circle .prob-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .prob-info h3 {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 6px;
+        }
+
+        .prob-info p {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin: 0;
+        }
+
+        /* Barra de progreso */
+        .prob-bar-wrapper {
+            margin-top: 16px;
+        }
+
+        .prob-bar-track {
+            height: 8px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 50px;
+            overflow: hidden;
+        }
+
+        .prob-bar-fill {
+            height: 100%;
+            border-radius: 50px;
+            transition: width 1s ease;
+        }
+
+        .prob-bar-fill.low    { background: linear-gradient(90deg, #4ade80, #86efac); }
+        .prob-bar-fill.medium { background: linear-gradient(90deg, #facc15, #fde68a); }
+        .prob-bar-fill.high   { background: linear-gradient(90deg, #f87171, #fca5a5); }
+
+        .prob-bar-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6px;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        /* Listas */
+        .eval-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .eval-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .eval-list li::before {
+            content: '›';
+            color: var(--blue-light);
+            font-size: 18px;
+            line-height: 1.2;
+            flex-shrink: 0;
+        }
+
+        .risk-list li::before  { color: #f87171; }
+        .rec-list  li::before  { color: #4ade80; }
+
+        @media (max-width: 600px) {
+            .prob-display { flex-direction: column; align-items: flex-start; }
+            .eval-header  { flex-direction: column; gap: 10px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="nav-bar">
+    <div class="nav-left">
+        <img src="/static/img/logo.jpeg" alt="Logo" class="logo">
+        <h2 class="module-name">Evaluación con IA</h2>
+    </div>
+    <a href="{{ url_for('view_patient', paciente_id=paciente.id) }}" class="btn">← Volver</a>
+</nav>
+
+<div class="page-body">
+
+    <!-- Header -->
+    <div class="eval-header">
+        <span class="eval-header-icon">🤖</span>
+        <div>
+            <h1>Evaluación de Riesgo — {{ paciente.nombre }}</h1>
+            <p>Análisis generado por el modelo de inteligencia artificial avanzado</p>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="error-box">
+        ⚠️ {{ error }}
+    </div>
+    {% else %}
+
+    <!-- Resultado principal -->
+    <div class="result-card">
+        <h2>📊 Resultado de Evaluación</h2>
+
+        {% set prob_pct = (prob * 100) | round(2) %}
+        {% set level = 'high' if prob_pct >= 50 else 'medium' if prob_pct >= 25 else 'low' %}
+
+        <div class="prob-display">
+            <div class="prob-circle {{ level }}">
+                <span class="prob-num">{{ "%.0f"|format(prob_pct) }}%</span>
+                <span class="prob-label">riesgo</span>
+            </div>
+            <div class="prob-info">
+                <h3>{{ stage }}</h3>
+                <p>
+                    {% if level == 'low' %}
+                        El paciente presenta un riesgo bajo de desarrollar diabetes según los datos clínicos actuales.
+                    {% elif level == 'medium' %}
+                        El paciente presenta un riesgo moderado. Se recomienda seguimiento cercano.
+                    {% else %}
+                        El paciente presenta un riesgo elevado. Se recomienda intervención médica prioritaria.
+                    {% endif %}
+                </p>
+                <div class="prob-bar-wrapper">
+                    <div class="prob-bar-track">
+                        <div class="prob-bar-fill {{ level }}" style="width: {{ prob_pct }}%"></div>
+                    </div>
+                    <div class="prob-bar-labels">
+                        <span>0%</span>
+                        <span>Bajo riesgo</span>
+                        <span>Alto riesgo</span>
+                        <span>100%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Factores de riesgo -->
+    <div class="result-card">
+        <h2>⚠️ Factores de Riesgo Identificados</h2>
+        <ul class="eval-list risk-list">
+            {% for factor in risk_factors %}
+            <li>{{ factor }}</li>
+            {% endfor %}
+            {% if not risk_factors %}
+            <li style="color: var(--text-dim);">No se identificaron factores de riesgo significativos.</li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <!-- Recomendaciones -->
+    <div class="result-card">
+        <h2>✅ Recomendaciones Clínicas</h2>
+        <ul class="eval-list rec-list">
+            {% for rec in recommendations %}
+            <li>{{ rec }}</li>
+            {% endfor %}
+            {% if not recommendations %}
+            <li style="color: var(--text-dim);">No hay recomendaciones adicionales.</li>
+            {% endif %}
+        </ul>
+    </div>
+
+    {% endif %}
+
+    <a href="{{ url_for('view_patient', paciente_id=paciente.id) }}" class="btn" style="display: inline-block; margin-top: 4px;">
+        ← Volver al Paciente
+    </a>
+
+</div>
+
+</body>
+</html>
